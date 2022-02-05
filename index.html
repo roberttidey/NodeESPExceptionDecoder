@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!--Import Google Icon Font-->
+		<link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+		<!--Import materialize.css-->
+		<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css" media="screen,projection" />
+
+		<!--Let browser know website is optimized for mobile-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+		<meta charset="utf-8"/>
+		<title>ESP8266ExceptionDecoder</title>
+	</head>
+
+	<body>
+		<header>
+			<div class="awTitle">ESP8266ExceptionDecoder</div>
+		</header>
+		<div class="container" id="events">
+			<div class = "row">
+				<div id = "exception" class = "tab col s12">
+					<div class="input-field col s12">
+					  <input value="test.ino" id="inoFile" type="text">
+					  <label class="active" for="inoFile">inoFile</label>
+					</div>
+					<div class="input-field col s12">
+					  <textarea value="" id="exceptionInput">
+					  </textarea>
+					  <label class="active" for="exceptionInput">exceptionInput</label>
+					</div>
+					<div>
+					  <textarea value="" id="stackTrace">
+					  </textarea>
+					  <label class="active" for="stackTrace">stackTrace</label>
+					</div>
+					<a class="btn green" id="decode" style="width:200px;height:24px">Decode</a>&nbsp&nbsp
+				</div>
+			</div> 
+		</div>
+		<style type="text/css">
+			.btn_grid {
+				margin: 3px 0;
+			}
+			.btn {
+				height: 28px;
+				line-height: 28px;
+			}
+			.awTitle {
+				display:inline-block;
+				font-size: x-large;
+				padding-left:20px;
+				width:200px;
+			}
+			header {
+				position:absolute;
+				top:0px;
+				left:0px;
+				height:32px;
+				right:0px;
+				overflow:hidden;
+				background:red;
+				color:white;
+			}
+			td {
+				height:20px;
+				width:200px;
+				padding:0px;
+			}
+			.container {
+				position:absolute;
+				top:32px;
+				bottom:0px;
+				left:10px;
+				right:60px;
+				overflow-y:auto;
+				overflow-x:hidden;
+			}
+			.tab {
+				overflow-x:hidden;
+			}
+			#stackTrace {
+			  height: 400px;
+			}
+		</style>
+	
+		<!--Import jQuery before materialize.js-->
+		<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>
+		<script type="text/javascript">(function($){
+$(function(){
+//	var host = window.location.hostname;
+	var host = "localhost:5000";
+	
+	// ******************************************************************
+	// init()
+	// ******************************************************************
+	function init() {
+	}
+		
+	function decodeExceptionText() {
+		// Run decoder and parse result ionto web page
+		var iF = $('#inoFile').val();
+		var eI = $('#exceptionInput').val();
+		$.get("http://" + host + "/decode", {'inoFile':iF, 'exceptionInput':eI}, function(data) {
+			var stackTrace_text = "";
+			if(data.length) {
+				stackTrace_text = data;
+			}
+			$('#stackTrace').val(stackTrace_text);
+		});
+	}
+	
+	// ******************************************************************
+	// Actions
+	// ******************************************************************	
+	$("#exception").on("click", "#decode", function() {
+		var btn = $(this);
+		decodeExceptionText();
+	});
+	
+	// ******************************************************************
+	// main
+	// ******************************************************************
+	init();
+	
+}); // end of document ready
+})(jQuery); // end of jQuery name space</script>
+	</body>
+</html>
