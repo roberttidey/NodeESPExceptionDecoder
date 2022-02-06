@@ -87,43 +87,50 @@
 		<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
 		<script src="http://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>
 		<script type="text/javascript">(function($){
-$(function(){
-//	var host = window.location.hostname;
-	var host = "localhost:5000";
-	
-	// ******************************************************************
-	// init()
-	// ******************************************************************
-	function init() {
-	}
-		
-	function decodeExceptionText() {
-		// Run decoder and parse result ionto web page
-		var iF = $('#inoFile').val();
-		var eI = $('#exceptionInput').val();
-		$.get("http://" + host + "/decode", {'inoFile':iF, 'exceptionInput':eI}, function(data) {
-			var stackTrace_text = "";
-			if(data.length) {
-				stackTrace_text = data;
-			}
-			$('#stackTrace').val(stackTrace_text);
-		});
-	}
-	
-	// ******************************************************************
-	// Actions
-	// ******************************************************************	
-	$("#exception").on("click", "#decode", function() {
-		var btn = $(this);
-		decodeExceptionText();
-	});
-	
-	// ******************************************************************
-	// main
-	// ******************************************************************
-	init();
-	
-}); // end of document ready
-})(jQuery); // end of jQuery name space</script>
+			$(function(){
+				var host = window.location.hostname + ":" + window.location.port;
+				
+				// ******************************************************************
+				// init()
+				// ******************************************************************
+				function init() {
+				}
+
+				function decodeExceptionText() {
+					// Run decoder and parse result ionto web page
+					var iF = $('#inoFile').val();
+					var eI = $('#exceptionInput').val();
+					jQuery.ajax ({
+						url: "http://" + host + "/decode",
+						type: "POST",
+						data: JSON.stringify({inoFile:iF, exceptionInput:eI}),
+						dataType: "text",
+						contentType: "application/json; charset=utf-8",
+						success: function(res){
+							var stackTrace_text = "";
+							if(res.length) {
+								stackTrace_text = res;
+							}
+							$('#stackTrace').val(stackTrace_text);
+						}
+					});
+				}
+				
+				// ******************************************************************
+				// Actions
+				// ******************************************************************	
+				$("#exception").on("click", "#decode", function() {
+					var btn = $(this);
+					decodeExceptionText();
+				});
+				
+				// ******************************************************************
+				// main
+				// ******************************************************************
+				init();
+				
+			}); // end of document ready
+		})(jQuery); // end of jQuery name space
+		</script>
 	</body>
 </html>

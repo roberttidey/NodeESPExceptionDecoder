@@ -14,9 +14,6 @@ Node JS based exception decoder for use with Arduino IDE v2 as this currently do
 - paste exception text from a log files
 - press decode
 
-#Todo
-- Currently uses a GET which means very long stack traces can fail. Convert to using POST
-
 
 
 

@@ -1,5 +1,6 @@
 const express = require('express'); //Import the express dependency
 const app = express();              //Instantiate an express app, the main work horse of this server
+app.use(express.json());
 const port = 5000;                  //Save the port number where your server will be listening
 const { exec } = require("child_process");
 
@@ -51,7 +52,6 @@ function findElfFile(inoFile) {
 	var mostRecent = 0;
 	var path;
 	for(i = 0; i < elfPaths.length; i++) {
-		console.log(elfPaths[i]);
 		try {
 			stats = fs.statSync(elfPaths[i]);
 			t = new Date(stats.mtime).getTime();
@@ -96,7 +96,6 @@ function parseStackTrace(exceptionText){
 	return result;
 }
 
-
 //Idiomatic expression in express to route and respond to a client request
 //get requests to the root ("/") will route here
 app.get('/', (req, res) => {
@@ -105,14 +104,14 @@ app.get('/', (req, res) => {
 });
 
 //get requests to decode exception will route here
-app.get('/decode', (req, res) => {
+app.post('/decode', (req, res) => {
 	var result = "Bad input";
-	if (req.query.inoFile && req.query.exceptionInput) {
-		elfFile = findElfFile(req.query.inoFile);
+	if (req.body.inoFile && req.body.exceptionInput) {
+		elfFile = findElfFile(req.body.inoFile);
 		if (elfFile) {
 			try {
-				result = decodeException(req.query.exceptionInput);
-				result += parseStackTrace(req.query.exceptionInput);
+				result = decodeException(req.body.exceptionInput);
+				result += parseStackTrace(req.body.exceptionInput);
 			}
 			catch (error){
 				result = error;
