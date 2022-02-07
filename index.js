@@ -80,7 +80,6 @@ function decodeException(exceptionText){
 			result += " [Unknown]";
 		}
 	}
-	result += "\r\n";
 	return result;
 }
 
@@ -93,7 +92,7 @@ function parseStackTrace(exceptionText){
 	} catch (error) {
 		result = error;
 	}
-	return result;
+	return result.split(/\r?\n/);
 }
 
 //Idiomatic expression in express to route and respond to a client request
@@ -105,20 +104,22 @@ app.get('/', (req, res) => {
 
 //get requests to decode exception will route here
 app.post('/decode', (req, res) => {
-	var result = "Bad input";
+	var exceptionR;
+	var stackR;
 	if (req.body.inoFile && req.body.exceptionInput) {
 		elfFile = findElfFile(req.body.inoFile);
 		if (elfFile) {
 			try {
-				result = decodeException(req.body.exceptionInput);
-				result += parseStackTrace(req.body.exceptionInput);
+				exceptionR = decodeException(req.body.exceptionInput);
+				stackR = parseStackTrace(req.body.exceptionInput);
 			}
 			catch (error){
-				result = error;
+				exceptionR = error;
+				stackR = ["undecoded"];
 			}
 		}
 	}
-	res.send(result);
+	res.json({exception:exceptionR, stack:stackR});
 });
 
 

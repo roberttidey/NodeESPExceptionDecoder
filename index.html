@@ -18,7 +18,7 @@
 		</header>
 		<div class="container" id="events">
 			<div class = "row">
-				<div id = "exception" class = "tab col s12">
+				<div id = "exceptionDecoder" class = "tab col s12">
 					<div class="input-field col s12">
 					  <input value="test.ino" id="inoFile" type="text">
 					  <label class="active" for="inoFile">inoFile</label>
@@ -27,6 +27,10 @@
 					  <textarea value="" id="exceptionInput">
 					  </textarea>
 					  <label class="active" for="exceptionInput">exceptionInput</label>
+					</div>
+					<div class="input-field col s12">
+					  <input value="" id="exception">
+					  <label class="active" for="exception">exception</label>
 					</div>
 					<div>
 					  <textarea value="" id="stackTrace">
@@ -104,14 +108,19 @@
 						url: "http://" + host + "/decode",
 						type: "POST",
 						data: JSON.stringify({inoFile:iF, exceptionInput:eI}),
-						dataType: "text",
+						dataType: "json",
 						contentType: "application/json; charset=utf-8",
 						success: function(res){
-							var stackTrace_text = "";
-							if(res.length) {
-								stackTrace_text = res;
+							if(res.stack) {
+								$('#stackTrace').val(res.stack.join('\r\n'));
+							} else {
+								$('#stackTrace').val("Bad");
 							}
-							$('#stackTrace').val(stackTrace_text);
+							if(res.exception) {
+								$('#exception').val(res.exception);
+							} else {
+								$('#exception').val("Bad");
+							}
 						}
 					});
 				}
@@ -119,7 +128,7 @@
 				// ******************************************************************
 				// Actions
 				// ******************************************************************	
-				$("#exception").on("click", "#decode", function() {
+				$("#exceptionDecoder").on("click", "#decode", function() {
 					var btn = $(this);
 					decodeExceptionText();
 				});
