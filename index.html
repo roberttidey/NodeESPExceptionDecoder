@@ -24,18 +24,25 @@
 					  <label class="active" for="inoFile">inoFile</label>
 					</div>
 					<div class="input-field col s12">
-					  <textarea value="" id="exceptionInput">
-					  </textarea>
+						<textarea value="" id="exceptionInput">
+						</textarea>
 					  <label class="active" for="exceptionInput">exceptionInput</label>
 					</div>
 					<div class="input-field col s12">
 					  <input value="" id="exception">
 					  <label class="active" for="exception">exception</label>
 					</div>
-					<div>
-					  <textarea value="" id="stackTrace">
-					  </textarea>
-					  <label class="active" for="stackTrace">stackTrace</label>
+					<div class="table-wrapper">
+						<table id="stackTrace">
+							<thead>
+							   <tr>
+								  <th>Addr</th>
+								  <th>Meaning</th>
+							  </tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
 					</div>
 					<a class="btn green" id="decode" style="width:200px;height:24px">Decode</a>&nbsp&nbsp
 				</div>
@@ -65,12 +72,18 @@
 				background:red;
 				color:white;
 			}
-			td {
-				height:20px;
-				width:200px;
-				padding:0px;
+			table {
+				border-spacing 5px 0px;
 			}
-			.container {
+			th, td {
+				padding-top: 1px;
+				padding-bottom: 1px;
+				padding-left: 1px;
+				padding-right: 15px;
+			}
+			tr:nth-child(even) {
+			  background-color: #D6EEEE;
+			}			.container {
 				position:absolute;
 				top:32px;
 				bottom:0px;
@@ -82,8 +95,10 @@
 			.tab {
 				overflow-x:hidden;
 			}
-			#stackTrace {
-			  height: 400px;
+			.table-wrapper {
+				border: 1px solid red;
+				height: 400px;
+				overflow: auto;
 			}
 		</style>
 	
@@ -102,6 +117,8 @@
 
 				function decodeExceptionText() {
 					// Run decoder and parse result ionto web page
+					$('#stackTrace tbody').empty();
+					$('#exception').val("");
 					var iF = $('#inoFile').val();
 					var eI = $('#exceptionInput').val();
 					jQuery.ajax ({
@@ -111,10 +128,25 @@
 						dataType: "json",
 						contentType: "application/json; charset=utf-8",
 						success: function(res){
+							var i;
+							var ix;
+							var stackLine;
 							if(res.stack) {
-								$('#stackTrace').val(res.stack.join('\r\n'));
-							} else {
-								$('#stackTrace').val("Bad");
+								for(i = 0; i < res.stack.length; i++) {
+									stackLine = res.stack[i];
+									ix = stackLine.indexOf(':');
+									if(ix >=0 && ix < 12) {
+										$('#stackTrace tbody').append('<tr><td>' + stackLine.substring(0, ix) + '</td><td>' + stackLine.substring(ix+1) + '</td></tr>');
+									} else {
+										ix = stackLine.indexOf('(inlined by)');
+										if(ix >=0 ) {
+											ix += 12; 
+											$('#stackTrace tbody').append('<tr><td>' + stackLine.substring(0, ix) + '</td><td>' + stackLine.substring(ix+1) + '</td></tr>');
+										} else {
+											$('#stackTrace tbody').append('<tr><td>-</td><td>' + stackLine + '</td></tr>');
+										}
+									}
+								}
 							}
 							if(res.exception) {
 								$('#exception').val(res.exception);
